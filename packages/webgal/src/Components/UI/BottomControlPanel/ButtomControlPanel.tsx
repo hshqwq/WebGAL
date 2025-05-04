@@ -1,7 +1,19 @@
+import { switchAuto } from '@/Core/controller/gamePlay/autoPlay';
+import { backToTitle } from '@/Core/controller/gamePlay/backToTitle';
+import { switchFast } from '@/Core/controller/gamePlay/fastSkip';
+import { loadGame } from '@/Core/controller/storage/loadGame';
+import { saveGame } from '@/Core/controller/storage/saveGame';
+import useFullscreen from '@/hooks/useFullscreen';
+import { setMenuPanelTag, setVisibility } from '@/store/GUIReducer';
+import { componentsVisibility, MenuPanelTag } from '@/store/guiInterface';
+import { RootState } from '@/store/store';
 import {
   AlignTextLeftOne,
+  DoubleDown,
   DoubleRight,
+  DoubleUp,
   FolderOpen,
+  FullScreen,
   Home,
   PlayOne,
   PreviewCloseOne,
@@ -9,19 +21,9 @@ import {
   ReplayMusic,
   Save,
   SettingTwo,
-  DoubleDown,
-  DoubleUp,
 } from '@icon-park/react';
-import styles from './bottomControlPanel.module.scss';
-import { switchAuto } from '@/Core/controller/gamePlay/autoPlay';
-import { switchFast } from '@/Core/controller/gamePlay/fastSkip';
 import { useDispatch, useSelector } from 'react-redux';
-import { RootState } from '@/store/store';
-import { setMenuPanelTag, setVisibility } from '@/store/GUIReducer';
-import { componentsVisibility, MenuPanelTag } from '@/store/guiInterface';
-import { backToTitle } from '@/Core/controller/gamePlay/backToTitle';
-import { saveGame } from '@/Core/controller/storage/saveGame';
-import { loadGame } from '@/Core/controller/storage/loadGame';
+import styles from './bottomControlPanel.module.scss';
 
 export const BottomControlPanel = () => {
   const strokeWidth = 2.5;
@@ -29,6 +31,8 @@ export const BottomControlPanel = () => {
   const GUIStore = useSelector((state: RootState) => state.GUI);
   const stageState = useSelector((state: RootState) => state.stage);
   const dispatch = useDispatch();
+  const { isSupported: isFullscreenSupported, isFullscreen, toggle: toggleFullscreen } = useFullscreen();
+
   const setComponentVisibility = (component: keyof componentsVisibility, visibility: boolean) => {
     dispatch(setVisibility({ component, visibility }));
   };
@@ -62,7 +66,7 @@ export const BottomControlPanel = () => {
       {GUIStore.showTextBox && stageState.enableFilm === '' && (
         <div className={styles.main}>
           {GUIStore.showTextBox && (
-            <span className={styles.singleButton} onClick={() => setComponentVisibility('showTextBox', false)}>
+            <button className={styles.singleButton} onClick={() => setComponentVisibility('showTextBox', false)}>
               <PreviewCloseOne
                 className={styles.button}
                 theme="outline"
@@ -71,10 +75,10 @@ export const BottomControlPanel = () => {
                 strokeWidth={strokeWidth}
               />
               <span className={styles.button_text}>隐藏</span>
-            </span>
+            </button>
           )}
           {!GUIStore.showTextBox && (
-            <span className={styles.singleButton} onClick={() => setComponentVisibility('showTextBox', true)}>
+            <button className={styles.singleButton} onClick={() => setComponentVisibility('showTextBox', true)}>
               <PreviewOpen
                 className={styles.button}
                 theme="outline"
@@ -83,9 +87,9 @@ export const BottomControlPanel = () => {
                 strokeWidth={strokeWidth}
               />
               <span className={styles.button_text}>显示</span>
-            </span>
+            </button>
           )}
-          <span
+          <button
             className={styles.singleButton}
             onClick={() => {
               setComponentVisibility('showBacklog', true);
@@ -100,8 +104,8 @@ export const BottomControlPanel = () => {
               strokeWidth={strokeWidth}
             />
             <span className={styles.button_text}>回想</span>
-          </span>
-          <span
+          </button>
+          <button
             className={styles.singleButton}
             onClick={() => {
               let VocalControl: any = document.getElementById('currentVocal');
@@ -120,12 +124,12 @@ export const BottomControlPanel = () => {
               strokeWidth={strokeWidth}
             />
             <span className={styles.button_text}>重播</span>
-          </span>
-          <span id="Button_ControlPanel_auto" className={styles.singleButton} onClick={switchAuto}>
+          </button>
+          <button id="Button_ControlPanel_auto" className={styles.singleButton} onClick={switchAuto}>
             <PlayOne className={styles.button} theme="outline" size={size} fill="#f5f5f7" strokeWidth={strokeWidth} />
             <span className={styles.button_text}>自动</span>
-          </span>
-          <span id="Button_ControlPanel_fast" className={styles.singleButton} onClick={switchFast}>
+          </button>
+          <button id="Button_ControlPanel_fast" className={styles.singleButton} onClick={switchFast}>
             <DoubleRight
               className={styles.button}
               theme="outline"
@@ -134,8 +138,8 @@ export const BottomControlPanel = () => {
               strokeWidth={strokeWidth}
             />
             <span className={styles.button_text}>快进</span>
-          </span>
-          <span
+          </button>
+          <button
             className={styles.singleButton + ' ' + styles.fastsave}
             onClick={() => {
               saveGame(0);
@@ -150,8 +154,8 @@ export const BottomControlPanel = () => {
             />
             <span className={styles.button_text}>快速存档</span>
             <div className={styles.fastSlPreview + ' ' + styles.fastSPreview}>{fastSlPreview}</div>
-          </span>
-          <span
+          </button>
+          <button
             className={styles.singleButton + ' ' + styles.fastload}
             onClick={() => {
               loadGame(0);
@@ -160,8 +164,8 @@ export const BottomControlPanel = () => {
             <DoubleUp className={styles.button} theme="outline" size={size} fill="#f5f5f7" strokeWidth={strokeWidth} />
             <span className={styles.button_text}>快速读档</span>
             <div className={styles.fastSlPreview + ' ' + styles.fastLPreview}>{fastSlPreview}</div>
-          </span>
-          <span
+          </button>
+          <button
             className={styles.singleButton}
             onClick={() => {
               setMenuPanel(MenuPanelTag.Save);
@@ -170,8 +174,21 @@ export const BottomControlPanel = () => {
           >
             <Save className={styles.button} theme="outline" size={size} fill="#f5f5f7" strokeWidth={strokeWidth} />
             <span className={styles.button_text}>存档</span>
-          </span>
-          <span
+          </button>
+          {isFullscreenSupported && <button
+            className={`${styles.singleButton}${isFullscreen ? ' ' + styles.singleButton_active : ''}`}
+            onClick={toggleFullscreen}
+          >
+            <FullScreen
+              className={styles.button}
+              theme="outline"
+              size={size}
+              fill="#f5f5f7"
+              strokeWidth={strokeWidth}
+            />
+            <span className={styles.button_text}>全屏</span>
+          </button>}
+          <button
             className={styles.singleButton}
             onClick={() => {
               setMenuPanel(MenuPanelTag.Load);
@@ -186,8 +203,8 @@ export const BottomControlPanel = () => {
               strokeWidth={strokeWidth}
             />
             <span className={styles.button_text}>读档</span>
-          </span>
-          <span
+          </button>
+          <button
             className={styles.singleButton}
             onClick={() => {
               setMenuPanel(MenuPanelTag.Option);
@@ -202,8 +219,8 @@ export const BottomControlPanel = () => {
               strokeWidth={strokeWidth}
             />
             <span className={styles.button_text}>选项</span>
-          </span>
-          <span
+          </button>
+          <button
             className={styles.singleButton}
             onClick={() => {
               backToTitle();
@@ -211,7 +228,7 @@ export const BottomControlPanel = () => {
           >
             <Home className={styles.button} theme="outline" size={size} fill="#f5f5f7" strokeWidth={strokeWidth} />
             <span className={styles.button_text}>标题</span>
-          </span>
+          </button>
         </div>
       )}
     </div>

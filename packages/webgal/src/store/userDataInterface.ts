@@ -1,4 +1,4 @@
-import { IGameVar, IStageState } from './stageInterface';
+import { IGameVar, IStageState } from '@/Core/Modules/stage/stageInterface';
 import { language } from '@/config/language';
 import { IBacklogItem } from '@/Core/Modules/backlog';
 import { ISceneEntry } from '@/Core/Modules/scene';
@@ -16,12 +16,6 @@ export enum textSize {
   small,
   medium,
   large,
-}
-
-export enum textFont {
-  song,
-  hei,
-  lxgw,
 }
 
 export enum voiceOption {
@@ -47,11 +41,12 @@ export interface IOptionData {
   seVolume: number; // 音效音量
   uiSeVolume: number; // 用户界面音效音量
   slPage: number; // 存读档界面所在页面
-  textboxFont: textFont;
+  textboxFont: number;
   textboxOpacity: number;
   language: language;
   voiceInterruption: voiceOption; // 是否中断语音
   fullScreen: fullScreenOption;
+  skipAll: boolean; // 快进已读/快进全文
 }
 
 /**
@@ -81,6 +76,7 @@ export interface IAppreciationAsset {
   name: string;
   url: string;
   series: string;
+  order?: number;
 }
 
 export interface IAppreciation {
@@ -96,6 +92,8 @@ export interface IUserData {
   globalGameVar: IGameVar; // 不跟随存档的全局变量
   optionData: IOptionData; // 用户设置选项数据
   appreciationData: IAppreciation;
+  gameConfigInit: IGameVar;
+  readHistory: Record<string, string>;
 }
 
 export interface ISetUserDataPayload {

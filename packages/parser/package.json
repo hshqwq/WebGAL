@@ -1,11 +1,12 @@
 {
   "name": "webgal-parser",
-  "version": "4.5.12",
+  "version": "4.6.1",
   "description": "WebGAL script parser",
   "scripts": {
     "test": "vitest",
     "coverage": "vitest run --coverage",
     "build": "rimraf -rf ./build && rollup --config",
+    "prepublishOnly": "npm run build",
     "build-ci": "rollup --config",
     "debug": "tsx test/debug.ts",
     "debug-scss-parser": "tsx test/debugCssParser.ts",
@@ -19,7 +20,7 @@
   "dependencies": {
     "chevrotain": "^10.5.0",
     "cloudlogjs": "^1.0.11",
-    "lodash": "^4.17.21",
+    "lodash": "^4.17.23",
     "tsx": "^3.12.7"
   },
   "devDependencies": {

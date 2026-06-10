@@ -9,6 +9,7 @@ import { textSize } from '@/store/userDataInterface';
 import IMSSTextbox from '@/Stage/TextBox/IMSSTextbox';
 import { SCREEN_CONSTANTS } from '@/Core/util/constants';
 import useEscape from '@/hooks/useEscape';
+import { useStageState } from '@/hooks/useStageState';
 
 const userAgent = navigator.userAgent;
 const isFirefox = /firefox/i.test(userAgent);
@@ -20,24 +21,28 @@ export interface EnhancedNode {
 }
 
 export const TextBox = () => {
-  const stageState = useSelector((state: RootState) => state.stage);
+  const stageState = useStageState();
   const guiState = useSelector((state: RootState) => state.GUI);
   const userDataState = useSelector((state: RootState) => state.userData);
   const textDelay = useTextDelay(userDataState.optionData.textSpeed);
   const textDuration = useTextAnimationDuration(userDataState.optionData.textSpeed);
   let size = getTextSize(userDataState.optionData.textSize) + '%';
   const font = useFontFamily();
+  const isRead = stageState.isRead;
   const isText = stageState.showText !== '' || stageState.showName !== '';
   let textSizeState = userDataState.optionData.textSize;
   if (isText && stageState.showTextSize !== -1) {
     size = getTextSize(stageState.showTextSize) + '%';
     textSizeState = stageState.showTextSize;
   }
-  const lineLimit = match(textSizeState)
-    .with(textSize.small, () => 3)
-    .with(textSize.medium, () => 2)
-    .with(textSize.large, () => 2)
-    .default(() => 2);
+  const MaxTextLine = Number(userDataState.globalGameVar.Max_line); // congfig定义字体行数
+  const lineLimit = Number.isNaN(MaxTextLine)
+    ? match(textSizeState)
+        .with(textSize.small, () => 3)
+        .with(textSize.medium, () => 2)
+        .with(textSize.large, () => 2)
+        .default(() => 2)
+    : MaxTextLine;
   // 拆字
   const textArray = compileSentence(stageState.showText, lineLimit);
   const isHasName = stageState.showName !== '';
@@ -85,6 +90,7 @@ export const TextBox = () => {
   return (
     <Textbox
       textArray={textArray}
+      isRead={isRead}
       isText={isText}
       textDelay={textDelay}
       showName={showName}
@@ -138,15 +144,31 @@ export function compileSentence(
         })
         .endsWith(SegmentType.Link, () => {
           const val = node.value as EnhancedValue;
-          const enhancedNode = (
-            <span className="__enhanced_text" key={val.text + `${index}`}>
-              <ruby key={index + val.text}>
-                {val.text}
-                <rt>{val.ruby}</rt>
-              </ruby>
-            </span>
-          );
-          ln.push({ reactNode: enhancedNode, enhancedValue: val.values });
+          // 检查是否是注音文本（通过检查是否有ruby值）
+          if (val.ruby) {
+            // 注音文本作为整体处理
+            const enhancedNode = (
+              <span className="__enhanced_text" key={val.text + `${index}`}>
+                <ruby key={index + val.text}>
+                  {val.text}
+                  <rt>{val.ruby}</rt>
+                </ruby>
+              </span>
+            );
+            ln.push({ reactNode: enhancedNode, enhancedValue: val.values });
+          } else {
+            // 样式文本逐字处理
+            const chars = splitChars(val.text, replace_space_with_nbsp);
+            // eslint-disable-next-line max-nested-callbacks
+            chars.forEach((char, charIndex) => {
+              const enhancedNode = (
+                <span className="__enhanced_text" key={val.text + `${index}-${charIndex}`}>
+                  {char}
+                </span>
+              );
+              ln.push({ reactNode: enhancedNode, enhancedValue: val.values });
+            });
+          }
         });
     });
     return ln;

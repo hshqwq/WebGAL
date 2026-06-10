@@ -23,10 +23,10 @@ export function argsParser(
   });
   rawArgsList.forEach((e) => {
     const equalSignIndex = e.indexOf('=');
-    let argName = e.slice(0, equalSignIndex);
-    let argValue: string | undefined = e.slice(equalSignIndex + 1);
+    let argName = e.slice(0, equalSignIndex).trim();
+    let argValue: string | undefined = e.slice(equalSignIndex + 1).trim();
     if (equalSignIndex < 0) {
-      argName = e;
+      argName = e.trim();
       argValue = undefined;
     }
     // 判断是不是语音参数
@@ -35,36 +35,39 @@ export function argsParser(
         key: 'vocal',
         value: assetSetter(e, fileType.vocal),
       });
-    } else {
-      // 判断是不是省略参数
-      if (argValue === undefined) {
-        returnArrayList.push({
-          key: argName,
-          value: true,
-        });
-      } else {
-        // 是字符串描述的布尔值
-        if (argValue === 'true' || argValue === 'false') {
-          returnArrayList.push({
-            key: argName,
-            value: argValue === 'true',
-          });
-        } else {
-          // 是数字
-          if (!isNaN(Number(argValue))) {
-            returnArrayList.push({
-              key: argName,
-              value: Number(argValue),
-            });
-          } else {
-            // 是普通参数
-            returnArrayList.push({
-              key: argName,
-              value: argValue,
-            });
-          }
-        }
-      }
+    } else if (argName === 'vocal' && argValue !== undefined) {
+      returnArrayList.push({
+        key: argName,
+        value: assetSetter(argValue, fileType.vocal),
+      });
+    }
+    // 判断是不是省略参数
+    else if (argValue === undefined) {
+      returnArrayList.push({
+        key: argName,
+        value: true,
+      });
+    }
+    // 是字符串描述的布尔值
+    else if (argValue === 'true' || argValue === 'false') {
+      returnArrayList.push({
+        key: argName,
+        value: argValue === 'true',
+      });
+    }
+    // 是数字
+    else if (!isNaN(Number(argValue))) {
+      returnArrayList.push({
+        key: argName,
+        value: Number(argValue),
+      });
+    }
+    // 是普通参数
+    else {
+      returnArrayList.push({
+        key: argName,
+        value: argValue,
+      });
     }
   });
   return returnArrayList;

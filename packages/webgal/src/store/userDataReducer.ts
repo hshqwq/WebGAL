@@ -13,13 +13,12 @@ import {
   IUserData,
   fullScreenOption,
   playSpeed,
-  textFont,
   textSize,
   voiceOption,
 } from '@/store/userDataInterface';
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import cloneDeep from 'lodash/cloneDeep';
-import { ISetGameVar } from './stageInterface';
+import { ISetGameVar } from '@/Core/Modules/stage/stageInterface';
 
 const initialOptionSet: IOptionData = {
   slPage: 1,
@@ -31,11 +30,12 @@ const initialOptionSet: IOptionData = {
   bgmVolume: 25, // 背景音乐音量
   seVolume: 100, // 音效音量
   uiSeVolume: 50, // UI音效音量
-  textboxFont: textFont.song,
+  textboxFont: 0,
   textboxOpacity: 75,
   language: language.zhCn,
-  voiceInterruption: voiceOption.yes,
+  voiceInterruption: voiceOption.no,
   fullScreen: fullScreenOption.off,
+  skipAll: false,
 };
 
 // 初始化用户数据
@@ -47,6 +47,8 @@ export const initState: IUserData = {
     bgm: [],
     cg: [],
   },
+  gameConfigInit: {},
+  readHistory: {},
 };
 
 const userDataSlice = createSlice({
@@ -63,14 +65,15 @@ const userDataSlice = createSlice({
       state[key] = value;
     },
     unlockCgInUserData: (state, action: PayloadAction<IAppreciationAsset>) => {
-      const { name, url, series } = action.payload;
+      const { name, url, series, order } = action.payload;
       // 检查是否存在
       let isExist = false;
       state.appreciationData.cg.forEach((e) => {
         if (url === e.url) {
           isExist = true;
-          e.url = url;
+          e.name = name;
           e.series = series;
+          e.order = order;
         }
       });
       if (!isExist) {
@@ -84,7 +87,7 @@ const userDataSlice = createSlice({
       state.appreciationData.bgm.forEach((e) => {
         if (url === e.url) {
           isExist = true;
-          e.url = url;
+          e.name = name;
           e.series = series;
         }
       });
@@ -139,7 +142,11 @@ const userDataSlice = createSlice({
       Object.assign(state.optionData, initialOptionSet);
     },
     resetAllData(state) {
-      Object.assign(state, cloneDeep(initState));
+      const { gameConfigInit } = state;
+      Object.assign(state, { ...cloneDeep(initState), globalGameVar: cloneDeep(gameConfigInit), gameConfigInit });
+    },
+    setReadHistory: (state, action: PayloadAction<Record<'key' | 'value', string>>) => {
+      state.readHistory[action.payload.key] = action.payload.value;
     },
   },
 });
@@ -155,6 +162,7 @@ export const {
   unlockBgmInUserData,
   resetOptionSet,
   resetAllData,
+  setReadHistory,
 } = userDataSlice.actions;
 export default userDataSlice.reducer;
 

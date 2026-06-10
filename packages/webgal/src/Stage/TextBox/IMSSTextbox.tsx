@@ -1,10 +1,12 @@
 import styles from './textbox.module.scss';
-import { ReactNode, useEffect } from 'react';
+import { useEffect } from 'react';
 import { WebGAL } from '@/Core/WebGAL';
 import { ITextboxProps } from './types';
 import useApplyStyle from '@/hooks/useApplyStyle';
 import { css } from '@emotion/css';
 import { textSize } from '@/store/userDataInterface';
+import { useSelector } from 'react-redux';
+import { RootState } from '@/store/store';
 
 export default function IMSSTextbox(props: ITextboxProps) {
   const {
@@ -12,6 +14,7 @@ export default function IMSSTextbox(props: ITextboxProps) {
     textDelay,
     currentConcatDialogPrev,
     currentDialogKey,
+    isRead,
     isText,
     isSafari,
     isFirefox: boolean,
@@ -26,7 +29,12 @@ export default function IMSSTextbox(props: ITextboxProps) {
     textSizeState,
   } = props;
 
-  const applyStyle = useApplyStyle('Stage/TextBox/textbox.scss');
+  const applyStyle = useApplyStyle('textbox');
+  const readTextClassName = isRead ? ` ${applyStyle('readText', styles.readText)}` : '';
+  const readTextOuterClassName = isRead
+    ? ` ${applyStyle('readTextOuter', styles.readTextOuter)}`
+    : '';
+  const readTextInnerClassName = isRead ? ` ${applyStyle('readTextInner', styles.readTextInner)}` : '';
 
   useEffect(() => {
     function settleText() {
@@ -143,14 +151,18 @@ export default function IMSSTextbox(props: ITextboxProps) {
           <span
             // data-text={e}
             id={`${delay}`}
-            className={applyStyle('TextBox_textElement_Settled', styles.TextBox_textElement_Settled)}
+            className={applyStyle('TextBox_textElement_Settled', styles.TextBox_textElement_Settled) + readTextClassName}
             key={currentDialogKey + index}
             style={{ animationDelay: `${delay}ms`, animationDuration: `${textDuration}ms` }}
           >
             <span className={styles.zhanwei + styleAllText}>
               {e}
-              <span className={applyStyle('outer', styles.outer) + styleClassName + styleAllText}>{e}</span>
-              {isUseStroke && <span className={applyStyle('inner', styles.inner) + styleAllText}>{e}</span>}
+              <span className={applyStyle('outer', styles.outer) + readTextOuterClassName + styleClassName + styleAllText}>
+                {e}
+              </span>
+              {isUseStroke && (
+                <span className={applyStyle('inner', styles.inner) + readTextInnerClassName + styleAllText}>{e}</span>
+              )}
             </span>
           </span>
         );
@@ -159,14 +171,21 @@ export default function IMSSTextbox(props: ITextboxProps) {
         <span
           // data-text={e}
           id={`${delay}`}
-          className={`${applyStyle('TextBox_textElement_start', styles.TextBox_textElement_start)} Textelement_start`}
+          className={`${applyStyle(
+            'TextBox_textElement_start',
+            styles.TextBox_textElement_start,
+          )}${readTextClassName} Textelement_start`}
           key={currentDialogKey + index}
           style={{ animationDelay: `${delay}ms`, position: 'relative' }}
         >
           <span className={styles.zhanwei + styleAllText}>
             {e}
-            <span className={applyStyle('outer', styles.outer) + styleClassName + styleAllText}>{e}</span>
-            {isUseStroke && <span className={applyStyle('inner', styles.inner) + styleAllText}>{e}</span>}
+            <span className={applyStyle('outer', styles.outer) + readTextOuterClassName + styleClassName + styleAllText}>
+              {e}
+            </span>
+            {isUseStroke && (
+              <span className={applyStyle('inner', styles.inner) + readTextInnerClassName + styleAllText}>{e}</span>
+            )}
           </span>
         </span>
       );
@@ -185,7 +204,11 @@ export default function IMSSTextbox(props: ITextboxProps) {
     );
   });
 
-  const lineHeightCssStr = `line-height: ${textSizeState === textSize.medium ? '2.2em' : '2em'}`;
+  const userDataState = useSelector((state: RootState) => state.userData);
+  const lineHeightValue = textSizeState === textSize.medium ? 2.2 : 2;
+  const textLineHeight = userDataState.globalGameVar.Line_height;
+  const finalTextLineHeight = textLineHeight ? Number(textLineHeight) : lineHeightValue;
+  const lineHeightCssStr = `line-height: ${finalTextLineHeight}em`;
   const lhCss = css(lineHeightCssStr);
 
   return (

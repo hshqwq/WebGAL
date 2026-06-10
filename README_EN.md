@@ -2,7 +2,7 @@
 
 **[中文版本](/README.md)**
 
-**[Help us with translation | 协助翻译 | 翻訳のお手伝い ](https://github.com/MakinoharaShoko/WebGAL/tree/dev/packages/webgal/src/translations)**
+**[Help us with translation | 协助翻译 | 翻訳のお手伝い ](https://github.com/OpenWebGAL/WebGAL/tree/dev/packages/webgal/src/translations)**
 
 **[Join Discord Server](https://discord.gg/kPrQkJttJy)**
 
@@ -14,7 +14,7 @@
 
 # WebGAL Provides Visual Editor
 
-**Who needs to code to create visual novels? Welcome to experience [WebGAL Visual Editor](https://github.com/MakinoharaShoko/WebGAL_Terre/)**
+**Who needs to code to create visual novels? Welcome to experience [WebGAL Visual Editor](https://github.com/OpenWebGAL/WebGAL_Terre/)**
 
 Demo video: https://www.bilibili.com/video/BV1jS4y1i7Wz/
 
@@ -26,13 +26,13 @@ https://demo.openwebgal.com
 
 A complete game:
 
-[铃色☆记忆](http://hoshinasuzu.cn/) by Hoshinasuzu  [备用链接](http://hoshinasuzu.cc/)
+[WebGAL games showcase](https://www.openwebgal.com/games/)
 
 ### Creating Games with WebGAL
 
 [WebGAL Development Documentation](https://docs.openwebgal.com/en)
 
-[Download WebGAL Graphical Editor](https://github.com/MakinoharaShoko/WebGAL_Terre/releases)
+[Download WebGAL Graphical Editor](https://github.com/OpenWebGAL/WebGAL_Terre/releases)
 
 ## WebGAL Advantages and Features
 
@@ -62,6 +62,14 @@ Even so, your sponsorship can provide motivation for the developers to move forw
 
 [Sponsor this project](https://docs.openwebgal.com/en/sponsor/)
 
+## Related Projects
+
+- [webgal-craft](https://github.com/A-kirami/webgal-craft): A community WIP visual editor for WebGAL.
+- [Webgal_transformEditor](https://github.com/KonshinHaoshin/Webgal_transformEditor): A visual editor for `setTransform` and `changeFigure` scene scripting.
+- [webgal-language-tools](https://github.com/xiaoxustudio/webgal-language-tools): Volar.js-based language tools for WebGAL, with LSP, VS Code extension, and Monaco support.
+- [webgal-tool-l2dw](https://github.com/LostWaym/webgal-tool-l2dw): A Live2D utility for WebGAL to adjust models and motions and export related commands.
+- [webgal-mygo](https://github.com/boomwwww/webgal-mygo): A MyGO-specific maintenance fork of the WebGAL engine.
+
 # Sponsors
 
 <a href="https://openwebgal.com/">
@@ -70,4 +78,4 @@ Even so, your sponsorship can provide motivation for the developers to move forw
 
 ## Stargazers over time
 
-[![Stargazers over time](https://starchart.cc/MakinoharaShoko/WebGAL.svg)](https://starchart.cc/MakinoharaShoko/WebGAL)
+[![Stargazers over time](https://starchart.cc/OpenWebGAL/WebGAL.svg)](https://starchart.cc/OpenWebGAL/WebGAL)

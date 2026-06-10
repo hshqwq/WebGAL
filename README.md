@@ -2,7 +2,7 @@
 
 ### **[English Version](/README_EN.md)** | **[日本語版](/README_JP.md)** | **[한국어](/README_KO.md)** | **[Français](/README_FR.md)**
 
-**[Help us with translation | 协助翻译 | 翻訳のお手伝い | 번역을 도와주세요](https://github.com/MakinoharaShoko/WebGAL/tree/dev/packages/webgal/src/translations)**
+**[Help us with translation | 协助翻译 | 翻訳のお手伝い | 번역을 도와주세요](https://github.com/OpenWebGAL/WebGAL/tree/dev/packages/webgal/src/translations)**
 
 **[Join Discord Server | 加入 Discord 讨论 | Discordのディスカッションに参加する](https://discord.gg/kPrQkJttJy)**
 
@@ -14,7 +14,7 @@
 
 # WebGAL 提供可视化编辑器
 
-**创作视觉小说，何须会编程？欢迎体验 [WebGAL 图形化编辑器](https://github.com/MakinoharaShoko/WebGAL_Terre/)**
+**创作视觉小说，何须会编程？欢迎体验 [WebGAL 图形化编辑器](https://github.com/OpenWebGAL/WebGAL_Terre/)**
 
 ## 在线体验
 
@@ -24,7 +24,7 @@ https://demo.openwebgal.com
 
 #### 完整的游戏
 
-[铃色☆记忆](http://hoshinasuzu.cn/) by 星奈组  [备用链接](http://hoshinasuzu.cc/)
+[WebGAL 官方游戏展示页](https://www.openwebgal.com/games/)
 
 [Elf of Era Idols Project](https://store.steampowered.com/app/2414730/Elf_of_Era_Idols_Project/) (通过 Steam 获取)
 
@@ -32,9 +32,9 @@ https://demo.openwebgal.com
 
 [WebGAL 开发文档](https://docs.openwebgal.com/)
 
-[下载 WebGAL 图形化编辑器](https://github.com/MakinoharaShoko/WebGAL_Terre/releases)
+[下载 WebGAL 图形化编辑器](https://github.com/OpenWebGAL/WebGAL_Terre/releases)
 
-你也可以使用源代码或 [WebGAL 调试工具](https://github.com/MakinoharaShoko/WebGAL/releases) 制作游戏，并使用 [WebGAL Script VS Code 插件](https://marketplace.visualstudio.com/items?itemName=c6h5-no2.webgal-script-basics) 来启用语法高亮
+你也可以使用源代码或 [WebGAL 调试工具](https://github.com/OpenWebGAL/WebGAL/releases) 制作游戏，并使用 [WebGAL Script VS Code 插件](https://marketplace.visualstudio.com/items?itemName=c6h5-no2.webgal-script-basics) 来启用语法高亮
 
 ## WebGAL 优势与特色
 
@@ -64,6 +64,14 @@ WebGAL 是一款开源软件，因此你可以免费在 MPL-2.0 开源协议的�
 
 [赞助本项目](https://docs.openwebgal.com/sponsor/)
 
+## WebGAL 相关项目
+
+- [webgal-craft](https://github.com/A-kirami/webgal-craft): 社区开发中的 WebGAL 可视化编辑器。
+- [Webgal_transformEditor](https://github.com/KonshinHaoshin/Webgal_transformEditor): 用于可视化编辑 `setTransform` 与 `changeFigure` 的运镜脚本工具。
+- [webgal-language-tools](https://github.com/xiaoxustudio/webgal-language-tools): 基于 Volar.js 的 WebGAL 语言工具链，提供 LSP、VS Code 扩展和 Monaco 支持。
+- [webgal-tool-l2dw](https://github.com/LostWaym/webgal-tool-l2dw): 面向 WebGAL 的 Live2D 工具，可调整模型与动作并导出相关指令。
+- [webgal-mygo](https://github.com/boomwwww/webgal-mygo): 面向 MyGO 项目的 WebGAL 专版引擎维护分支。
+
 # Sponsors
 
 <a href="https://openwebgal.com/">
@@ -72,4 +80,4 @@ WebGAL 是一款开源软件，因此你可以免费在 MPL-2.0 开源协议的�
 
 ## Stargazers over time
 
-[![Stargazers over time](https://starchart.cc/MakinoharaShoko/WebGAL.svg)](https://starchart.cc/MakinoharaShoko/WebGAL)
+[![Stargazers over time](https://starchart.cc/OpenWebGAL/WebGAL.svg)](https://starchart.cc/OpenWebGAL/WebGAL)

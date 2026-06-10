@@ -3,7 +3,6 @@ import { RootState } from '@/store/store';
 import React from 'react';
 import styles from '@/UI/Extra/extra.module.scss';
 import { useValue } from '@/hooks/useValue';
-import { setStage } from '@/store/stageReducer';
 import { GoEnd, GoStart, MusicList, PlayOne, SquareSmall } from '@icon-park/react';
 import useSoundEffect from '@/hooks/useSoundEffect';
 import { setGuiAsset } from '@/store/GUIReducer';
@@ -62,6 +61,12 @@ export function ExtraBgm() {
       </div>
     );
   });
+
+  // If there are no BGM tracks available, don't render the player controls
+  if (bgmListLen === 0) {
+    return null;
+  }
+
   return (
     <div className={styles.bgmContainer} style={{ maxHeight: bgmPlayerHeight }}>
       <div className={styles.bgmPlayerMain}>

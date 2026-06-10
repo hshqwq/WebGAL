@@ -58,6 +58,13 @@ const zhTw = {
               contributors: '貢獻者',
               website: '網站',
             },
+            skipAll: {
+              title: '快進模式',
+              options: {
+                read: '已讀',
+                all: '全部',
+              }
+            }
           },
         },
         display: {
@@ -89,9 +96,9 @@ const zhTw = {
             textFont: {
               title: '文字字體',
               options: {
+                resourceHanRounded: '資源圓體',
                 siYuanSimSun: '思源宋體',
                 SimHei: '黑體',
-                lxgw: '霞鶩文楷',
               },
             },
             textboxOpacity: {
@@ -166,6 +173,7 @@ const zhTw = {
     exit: {
       title: '退出遊戲',
       subtitle: 'EXIT',
+      tips: '確定要退出遊戲嗎？',
     },
   },
 
@@ -185,7 +193,7 @@ const zhTw = {
       fullscreen: '全螢幕',
       options: '設定',
       title: '主選單',
-      titleTips: '確認返回到主選單嗎',
+      titleTips: '確定要返回主選單嗎？',
     },
   },
 

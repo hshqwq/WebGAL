@@ -1,13 +1,15 @@
-import { ITransform } from '@/store/stageInterface';
+import { ITransform } from '@/Core/Modules/stage/stageInterface';
 
 export interface IUserAnimation {
   name: string;
-  effects: Array<ITransform & { duration: number }>;
+  effects: Array<AnimationFrame>;
 }
 
+export type AnimationFrame = ITransform & { duration: number; ease: string };
+
 export class AnimationManager {
-  public nextEnterAnimationName: Map<string, string> = new Map();
-  public nextExitAnimationName: Map<string, string> = new Map();
+  // public nextEnterAnimationName: Map<string, string> = new Map();
+  // public nextExitAnimationName: Map<string, string> = new Map();
   private animations: Array<IUserAnimation> = [];
 
   public addAnimation(animation: IUserAnimation) {

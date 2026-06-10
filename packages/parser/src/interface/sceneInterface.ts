@@ -1,7 +1,7 @@
 /**
  * 语句类型
  */
-import { sceneEntry } from './runtimeInterface';
+import { sceneEntry, ISceneEntry } from './runtimeInterface';
 import { fileType } from './assets';
 
 export enum commandType {
@@ -38,7 +38,8 @@ export enum commandType {
   setTransition,
   getUserInput,
   applyStyle,
-  wait
+  wait,
+  callSteam, // 调用Steam功能
 }
 
 /**
@@ -72,6 +73,7 @@ export interface ISentence {
   args: Array<arg>; // 参数列表
   sentenceAssets: Array<IAsset>; // 语句携带的资源列表
   subScene: Array<string>; // 语句包含子场景列表
+  inlineComment: string; // 行内注释
 }
 
 /**
@@ -92,7 +94,7 @@ export interface IScene {
  */
 export interface ISceneData {
   currentSentenceId: number; // 当前语句ID
-  sceneStack: Array<sceneEntry>; // 场景栈
+  sceneStack: Array<ISceneEntry>; // 场景栈
   currentScene: IScene; // 当前场景数据
 }
 

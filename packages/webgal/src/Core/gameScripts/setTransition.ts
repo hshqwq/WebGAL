@@ -1,10 +1,7 @@
 import { ISentence } from '@/Core/controller/scene/sceneInterface';
-import { IPerform } from '@/Core/Modules/perform/performInterface';
-import { webgalStore } from '@/store/store';
-import cloneDeep from 'lodash/cloneDeep';
-import { getSentenceArgByKey } from '@/Core/util/getSentenceArg';
-import { setStage } from '@/store/stageReducer';
-import { WebGAL } from '@/Core/WebGAL';
+import { createNonePerform, IPerform } from '@/Core/Modules/perform/performInterface';
+import { getBooleanArgByKey, getStringArgByKey } from '@/Core/util/getSentenceArg';
+import { stageStateManager } from '@/Core/Modules/stage/stageStateManager';
 
 /**
  * 设置转场效果
@@ -12,25 +9,21 @@ import { WebGAL } from '@/Core/WebGAL';
  */
 export const setTransition = (sentence: ISentence): IPerform => {
   // 根据参数设置指定位置
-  let key = '0';
-  for (const e of sentence.args) {
-    if (e.key === 'target') {
-      key = e.value.toString();
-    }
+  let key = getStringArgByKey(sentence, 'target') ?? '0';
+  const enterAnimation = getStringArgByKey(sentence, 'enter');
+  const exitAnimation = getStringArgByKey(sentence, 'exit');
+  const ignoreDefault = getBooleanArgByKey(sentence, 'ignoreDefault') ?? false;
+  if (enterAnimation) {
+    stageStateManager.updateAnimationSettings({ target: key, key: 'enterAnimationName', value: enterAnimation });
+    stageStateManager.updateAnimationSettings({
+      target: key,
+      key: 'enterAnimationIgnoreDefault',
+      value: ignoreDefault,
+    });
   }
-  if (getSentenceArgByKey(sentence, 'enter')) {
-    WebGAL.animationManager.nextEnterAnimationName.set(key, getSentenceArgByKey(sentence, 'enter')!.toString());
+  if (exitAnimation) {
+    stageStateManager.updateAnimationSettings({ target: key, key: 'exitAnimationName', value: exitAnimation });
+    stageStateManager.updateAnimationSettings({ target: key, key: 'exitAnimationIgnoreDefault', value: ignoreDefault });
   }
-  if (getSentenceArgByKey(sentence, 'exit')) {
-    WebGAL.animationManager.nextExitAnimationName.set(key + '-off', getSentenceArgByKey(sentence, 'exit')!.toString());
-  }
-  return {
-    performName: 'none',
-    duration: 0,
-    isHoldOn: false,
-    stopFunction: () => {},
-    blockingNext: () => false,
-    blockingAuto: () => false,
-    stopTimeout: undefined, // 暂时不用，后面会交给自动清除
-  };
+  return createNonePerform({ blockingAuto: false });
 };

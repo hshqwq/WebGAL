@@ -3,12 +3,9 @@ import { IPerform } from '@/Core/Modules/perform/performInterface';
 import React from 'react';
 import ReactDOM from 'react-dom';
 import styles from '@/Stage/FullScreenPerform/fullScreenPerform.module.scss';
-import { nextSentence } from '@/Core/controller/gamePlay/nextSentence';
-import { PerformController } from '@/Core/Modules/perform/performController';
-import { logger } from '@/Core/util/logger';
 import { WebGAL } from '@/Core/WebGAL';
-import { replace } from 'lodash';
 import useEscape from '@/hooks/useEscape';
+import { getBooleanArgByKey, getNumberArgByKey, getStringArgByKey } from '../util/getSentenceArg';
 /**
  * 显示一小段黑屏演示
  * @param sentence
@@ -19,10 +16,26 @@ export const intro = (sentence: ISentence): IPerform => {
    */
 
   const performName = `introPerform${Math.random().toString()}`;
-  let fontSize: string | undefined;
-  let backgroundColor: any = 'rgba(0, 0, 0, 1)';
-  let color: any = 'rgba(255, 255, 255, 1)';
-  const animationClass: any = (type: string, length = 0) => {
+
+  const fontSizeFromArgs = getStringArgByKey(sentence, 'fontSize') ?? 'medium';
+  let fontSize = '350%';
+  switch (fontSizeFromArgs) {
+    case 'small':
+      fontSize = '280%';
+      break;
+    case 'medium':
+      fontSize = '350%';
+      break;
+    case 'large':
+      fontSize = '420%';
+      break;
+  }
+  const backgroundImageFromArgs = getStringArgByKey(sentence, 'backgroundImage') ?? '';
+  const backgroundImage = `url("game/background/${backgroundImageFromArgs}") center/cover no-repeat`;
+  const backgroundColor = getStringArgByKey(sentence, 'backgroundColor') ?? 'rgba(0, 0, 0, 1)';
+  const color = getStringArgByKey(sentence, 'fontColor') ?? 'rgba(255, 255, 255, 1)';
+  const animationFromArgs = getStringArgByKey(sentence, 'animation') ?? '';
+  let animationClass: any = (type: string, length = 0) => {
     switch (type) {
       case 'fadeIn':
         return styles.fadeIn;
@@ -38,55 +51,18 @@ export const intro = (sentence: ISentence): IPerform => {
         return styles.fadeIn;
     }
   };
-  let chosenAnimationClass = styles.fadeIn;
-  let delayTime = 1500;
-  let isHold = false;
-  let isUserForward = false;
-
-  for (const e of sentence.args) {
-    if (e.key === 'backgroundColor') {
-      backgroundColor = e.value || 'rgba(0, 0, 0, 1)';
-    }
-    if (e.key === 'fontColor') {
-      color = e.value || 'rgba(255, 255, 255, 1)';
-    }
-    if (e.key === 'fontSize') {
-      switch (e.value) {
-        case 'small':
-          fontSize = '280%';
-          break;
-        case 'medium':
-          fontSize = '350%';
-          break;
-        case 'large':
-          fontSize = '420%';
-          break;
-      }
-    }
-    if (e.key === 'animation') {
-      chosenAnimationClass = animationClass(e.value);
-    }
-    if (e.key === 'delayTime') {
-      const parsedValue = parseInt(e.value.toString(), 10);
-      delayTime = isNaN(parsedValue) ? delayTime : parsedValue;
-    }
-    if (e.key === 'hold') {
-      if (e.value === true) {
-        isHold = true;
-      }
-    }
-    if (e.key === 'userForward') {
-      // 用户手动控制向前步进
-      if (e.value === true) {
-        isUserForward = true;
-        isHold = true; // 用户手动控制向前步进，所以必须是 hold
-        delayTime = 99999999; // 设置一个很大的延迟，这样自然就看起来不自动继续了
-      }
-    }
-  }
+  let chosenAnimationClass = animationClass(animationFromArgs);
+  let delayTime = getNumberArgByKey(sentence, 'delayTime') ?? 1500;
+  let isHold = getBooleanArgByKey(sentence, 'hold') ?? false;
+  let isUserForward = getBooleanArgByKey(sentence, 'userForward') ?? false;
+  // 设置一个很大的延迟，这样自然就看起来不自动继续了
+  delayTime = isUserForward ? 99999999 : delayTime;
+  // 用户手动控制向前步进，所以必须是 hold
+  isHold = isUserForward ? true : isHold;
 
   const introContainerStyle = {
-    background: backgroundColor,
+    background: backgroundImage,
+    backgroundColor: backgroundColor,
     color: color,
     fontSize: fontSize || '350%',
     width: '100%',
@@ -98,16 +74,14 @@ export const intro = (sentence: ISentence): IPerform => {
   let baseDuration = endWait + delayTime * introArray.length;
   const duration = isHold ? 1000 * 60 * 60 * 24 : 1000 + delayTime * introArray.length;
   let isBlocking = true;
-  let setBlockingStateTimeout = setTimeout(() => {
-    isBlocking = false;
-  }, baseDuration);
 
-  let timeout = setTimeout(() => {});
+  let setBlockingStateTimeout: ReturnType<typeof setTimeout> | undefined;
+  let timeout: ReturnType<typeof setTimeout> | undefined;
   const toNextIntroElement = () => {
     const introContainer = document.getElementById('introContainer');
     // 由于用户操作，相当于时间向前推进，这时候更新这个演出的预计完成时间
     baseDuration -= delayTime;
-    clearTimeout(setBlockingStateTimeout);
+    if (setBlockingStateTimeout) clearTimeout(setBlockingStateTimeout);
     setBlockingStateTimeout = setTimeout(() => {
       isBlocking = false;
     }, baseDuration);
@@ -132,8 +106,8 @@ export const intro = (sentence: ISentence): IPerform => {
           }
         }
         if (isEnd) {
-          clearTimeout(timeout);
-          clearTimeout(setBlockingStateTimeout);
+          if (timeout) clearTimeout(timeout);
+          if (setBlockingStateTimeout) clearTimeout(setBlockingStateTimeout);
           WebGAL.gameplay.performController.unmountPerform(performName);
         }
         return;
@@ -149,13 +123,13 @@ export const intro = (sentence: ISentence): IPerform => {
         if (index === len - 1) {
           // 并且已经完全显示了，这时候进行下一步
           if (currentDelay === 0) {
-            clearTimeout(timeout);
+            if (timeout) clearTimeout(timeout);
             WebGAL.gameplay.performController.unmountPerform(performName);
             // 卸载函数发生在 nextSentence 生效前，所以不需要做下一行的操作。
             // setTimeout(nextSentence, 0);
           } else {
             // 还没有完全显示，但是因为时间的推进，要提前完成演出，更新用于结束演出的计时器
-            clearTimeout(timeout);
+            if (timeout) clearTimeout(timeout);
             // 如果 Hold 了，自然不要自动结束
             if (!isHold) {
               timeout = setTimeout(() => {
@@ -169,10 +143,8 @@ export const intro = (sentence: ISentence): IPerform => {
   };
 
   /**
-   * 接受 next 事件
+   * 构造 intro 视图。真正挂载必须等 commit 后的 startFunction。
    */
-  WebGAL.events.userInteractNext.on(toNextIntroElement);
-
   const showIntro = introArray.map((e, i) => (
     <div
       key={'introtext' + i + Math.random().toString()}
@@ -188,28 +160,36 @@ export const intro = (sentence: ISentence): IPerform => {
       <div style={{ padding: '3em 4em 3em 4em' }}>{showIntro}</div>
     </div>
   );
-  // eslint-disable-next-line react/no-deprecated
-  ReactDOM.render(intro, document.getElementById('introContainer'));
-  const introContainer = document.getElementById('introContainer');
-
-  if (introContainer) {
-    introContainer.style.display = 'block';
-  }
 
   return {
     performName,
     duration,
     isHoldOn: false,
+    startFunction: () => {
+      isBlocking = true;
+      setBlockingStateTimeout = setTimeout(() => {
+        isBlocking = false;
+      }, baseDuration);
+      WebGAL.events.userInteractNext.on(toNextIntroElement);
+      // eslint-disable-next-line react/no-deprecated
+      ReactDOM.render(intro, document.getElementById('introContainer'));
+      const introContainer = document.getElementById('introContainer');
+
+      if (introContainer) {
+        introContainer.style.display = 'block';
+      }
+    },
     stopFunction: () => {
       const introContainer = document.getElementById('introContainer');
       if (introContainer) {
         introContainer.style.display = 'none';
       }
+      if (timeout) clearTimeout(timeout);
+      if (setBlockingStateTimeout) clearTimeout(setBlockingStateTimeout);
       WebGAL.events.userInteractNext.off(toNextIntroElement);
     },
     blockingNext: () => isBlocking,
     blockingAuto: () => isBlocking,
-    stopTimeout: undefined, // 暂时不用，后面会交给自动清除
     goNextWhenOver: true,
   };
 };

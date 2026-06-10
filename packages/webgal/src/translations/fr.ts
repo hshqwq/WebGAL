@@ -58,6 +58,13 @@ const fr = {
               contributors: 'Contributeurs',
               website: 'Site web',
             },
+            skipAll: {
+              title: 'Mode Avance Rapide',
+              options: {
+                read: 'Lu',
+                all: 'Tout',
+              }
+            }
           },
         },
         display: {
@@ -82,9 +89,9 @@ const fr = {
             textFont: {
               title: 'Police du texte',
               options: {
+                resourceHanRounded: 'Resource Han Rounded',
                 siYuanSimSun: 'Source Han Serif',
                 SimHei: 'Sans',
-                lxgw: 'LXGW WenKai',
               },
             },
             textboxOpacity: {
@@ -152,6 +159,7 @@ const fr = {
     exit: {
       title: 'QUITTER',
       subtitle: '',
+      tips: 'Êtes-vous sûr de vouloir quitter ?',
     },
   },
 
@@ -171,7 +179,7 @@ const fr = {
       fullscrren: 'Plein écran',
       options: 'Options',
       title: 'Titre',
-      titleTips: "Confirmer le retour à l'écran titre",
+      titleTips: "Confirmer le retour à l'écran titre ?",
     },
   },
 

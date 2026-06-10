@@ -1,25 +1,93 @@
 import { generateUniversalSoftInAnimationObj } from '@/Core/controller/stage/pixi/animations/universalSoftIn';
 import { logger } from '@/Core/util/logger';
 import { generateUniversalSoftOffAnimationObj } from '@/Core/controller/stage/pixi/animations/universalSoftOff';
-import { webgalStore } from '@/store/store';
 import cloneDeep from 'lodash/cloneDeep';
-import { baseTransform } from '@/store/stageInterface';
+import { baseTransform } from '@/Core/Modules/stage/stageInterface';
 import { generateTimelineObj } from '@/Core/controller/stage/pixi/animations/timeline';
 import { WebGAL } from '@/Core/WebGAL';
-import PixiStage from '@/Core/controller/stage/pixi/PixiController';
+import PixiStage, { IAnimationObject } from '@/Core/controller/stage/pixi/PixiController';
+import { IUserAnimation } from './animations';
+import { pickBy } from 'lodash';
+import {
+  DEFAULT_BG_IN_DURATION,
+  DEFAULT_BG_OUT_DURATION,
+  DEFAULT_FIG_IN_DURATION,
+  DEFAULT_FIG_OUT_DURATION,
+} from '../constants';
+import { stageStateManager } from '@/Core/Modules/stage/stageStateManager';
+import { AnimationFrame } from '@/Core/Modules/animations';
 
-export function getAnimationObject(animationName: string, target: string, duration: number) {
+// eslint-disable-next-line max-params
+export function getAnimationObject(
+  animationName: string,
+  target: string,
+  duration: number,
+  writeDefault: boolean,
+  writeFullEffect = true,
+  syncEndStateToStageState = true,
+) {
+  const mappedEffects = getAnimationTimeline(animationName, target, writeDefault, writeFullEffect);
+  if (mappedEffects) {
+    return generateTimelineObj(mappedEffects, target, duration, syncEndStateToStageState);
+  }
+  return null;
+}
+
+export function applyAnimationEndState(
+  animationName: string,
+  target: string,
+  writeDefault: boolean,
+  writeFullEffect = true,
+) {
+  const mappedEffects = getAnimationTimeline(animationName, target, writeDefault, writeFullEffect);
+  if (!mappedEffects || mappedEffects.length === 0) return null;
+  const { duration, ease, ...endState } = mappedEffects[mappedEffects.length - 1];
+  stageStateManager.updateEffect({ target, transform: endState });
+  return mappedEffects;
+}
+
+export function getAnimationTimeline(
+  animationName: string,
+  target: string,
+  writeDefault: boolean,
+  writeFullEffect = true,
+): AnimationFrame[] | null {
   const effect = WebGAL.animationManager.getAnimations().find((ani) => ani.name === animationName);
   if (effect) {
+    const unionKeys = new Set<string>();
+    const unionScaleKeys = new Set<string>();
+    const unionPositionKeys = new Set<string>();
+    if (!writeFullEffect) {
+      effect.effects.forEach((effect) => {
+        Object.keys(effect).forEach((k) => unionKeys.add(k));
+        if (effect.scale) Object.keys(effect.scale).forEach((k) => unionScaleKeys.add(k));
+        if (effect.position) Object.keys(effect.position).forEach((k) => unionPositionKeys.add(k));
+      });
+    }
     const mappedEffects = effect.effects.map((effect) => {
-      const targetSetEffect = webgalStore.getState().stage.effects.find((e) => e.target === target);
-      const newEffect = cloneDeep({ ...(targetSetEffect?.transform ?? baseTransform), duration: 0 });
-      PixiStage.assignTransform(newEffect, effect);
+      const targetSetEffect = stageStateManager.getCalculationStageState().effects.find((e) => e.target === target);
+      const sourceTransform =
+        !writeDefault && targetSetEffect && targetSetEffect.transform ? targetSetEffect.transform : baseTransform;
+      let newEffect;
+
+      if (writeFullEffect) {
+        newEffect = cloneDeep({ ...sourceTransform, duration: 0, ease: '' });
+      } else {
+        const targetScale = pickBy(sourceTransform.scale || {}, (source, key) => unionScaleKeys.has(key));
+        const targetPosition = pickBy(sourceTransform.position || {}, (s, key) => unionPositionKeys.has(key));
+        const originalTransform = { ...pickBy(sourceTransform, (source, key) => unionKeys.has(key)) };
+        if (unionScaleKeys.size > 0) originalTransform.scale = targetScale;
+        if (unionPositionKeys.size > 0) originalTransform.position = targetPosition;
+        newEffect = cloneDeep({ ...originalTransform, duration: 0, ease: '' });
+      }
+
+      PixiStage.assignTransform(newEffect, effect, false);
       newEffect.duration = effect.duration;
+      newEffect.ease = effect.ease;
       return newEffect;
     });
     logger.debug('装载自定义动画', mappedEffects);
-    return generateTimelineObj(mappedEffects, target, duration);
+    return mappedEffects;
   }
   return null;
 }
@@ -44,50 +112,64 @@ export function getEnterExitAnimation(
   realTarget?: string, // 用于立绘和背景移除时，以当前时间打上特殊标记
 ): {
   duration: number;
-  animation: {
-    setStartState: () => void;
-    tickerFunc: (delta: number) => void;
-    setEndState: () => void;
-  } | null;
+  animation: IAnimationObject | null;
 } {
   if (type === 'enter') {
-    let duration = 500;
+    let duration = DEFAULT_FIG_IN_DURATION;
     if (isBg) {
-      duration = 1500;
+      duration = DEFAULT_BG_IN_DURATION;
     }
+    const animationSettings = stageStateManager
+      .getCalculationStageState()
+      .animationSettings.find((setting) => setting.target === target);
+    duration = animationSettings?.enterDuration ?? duration;
     // 走默认动画
-    let animation: {
-      setStartState: () => void;
-      tickerFunc: (delta: number) => void;
-      setEndState: () => void;
-    } | null = generateUniversalSoftInAnimationObj(realTarget ?? target, duration);
-    const animarionName = WebGAL.animationManager.nextEnterAnimationName.get(target);
-    if (animarionName) {
+    let animation: IAnimationObject | null = generateUniversalSoftInAnimationObj(realTarget ?? target, duration);
+
+    const transformState = stageStateManager.getCalculationStageState().effects;
+    const targetEffect = transformState.find((effect) => effect.target === target);
+
+    const animationName = animationSettings?.enterAnimationName;
+    if (animationName && !targetEffect) {
       logger.debug('取代默认进入动画', target);
-      animation = getAnimationObject(animarionName, realTarget ?? target, getAnimateDuration(animarionName));
-      duration = getAnimateDuration(animarionName);
-      // 用后重置
-      WebGAL.animationManager.nextEnterAnimationName.delete(target);
+      animation = getAnimationObject(
+        animationName,
+        realTarget ?? target,
+        getAnimateDuration(animationName),
+        false,
+        !(animationSettings?.enterAnimationIgnoreDefault ?? false),
+      );
+      duration = getAnimateDuration(animationName);
     }
     return { duration, animation };
   } else {
-    let duration = 750;
+    // exit
+    let duration = DEFAULT_FIG_OUT_DURATION;
     if (isBg) {
-      duration = 1500;
+      duration = DEFAULT_BG_OUT_DURATION;
     }
+    const animationSettings = stageStateManager
+      .getCalculationStageState()
+      .animationSettings.find((setting) => setting.target === target);
+    duration = animationSettings?.exitDuration ?? duration;
     // 走默认动画
-    let animation: {
-      setStartState: () => void;
-      tickerFunc: (delta: number) => void;
-      setEndState: () => void;
-    } | null = generateUniversalSoftOffAnimationObj(realTarget ?? target, duration);
-    const animarionName = WebGAL.animationManager.nextExitAnimationName.get(target);
-    if (animarionName) {
+    let animation: IAnimationObject | null = generateUniversalSoftOffAnimationObj(realTarget ?? target, duration);
+    const animationName = animationSettings?.exitAnimationName;
+    if (animationName) {
       logger.debug('取代默认退出动画', target);
-      animation = getAnimationObject(animarionName, realTarget ?? target, getAnimateDuration(animarionName));
-      duration = getAnimateDuration(animarionName);
-      // 用后重置
-      WebGAL.animationManager.nextExitAnimationName.delete(target);
+      animation = getAnimationObject(
+        animationName,
+        realTarget ?? target,
+        getAnimateDuration(animationName),
+        false,
+        !(animationSettings?.exitAnimationIgnoreDefault ?? false),
+      );
+      duration = getAnimateDuration(animationName);
+    }
+    if (animationSettings) {
+      // 退出动画拿完后，删了这个设定
+      stageStateManager.removeAnimationSettingsByTargetOff(target);
+      logger.debug('删除退出动画设定', target);
     }
     return { duration, animation };
   }

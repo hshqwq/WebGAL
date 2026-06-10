@@ -2,7 +2,7 @@
 
 **[中文版本](/README.md)**
 
-**[Help us with translation | 协助翻译 | 翻訳のお手伝い ](https://github.com/MakinoharaShoko/WebGAL/tree/dev/packages/webgal/src/translations)**
+**[Help us with translation | 协助翻译 | 翻訳のお手伝い ](https://github.com/OpenWebGAL/WebGAL/tree/dev/packages/webgal/src/translations)**
 
 **[Join Discord Server](https://discord.gg/kPrQkJttJy)**
 
@@ -14,7 +14,7 @@
 
 # WebGAL はビジュアルエディターを提供します
 
-**ビジュアルノベルを作るのにプログラミングは必要ですか？ [WebGAL グラフィカルエディター](https://github.com/MakinoharaShoko/WebGAL_Terre/) を体験してください**
+**ビジュアルノベルを作るのにプログラミングは必要ですか？ [WebGAL グラフィカルエディター](https://github.com/OpenWebGAL/WebGAL_Terre/) を体験してください**
 
 デモビデオ: https://youtu.be/S7xxVe9MGXk
 
@@ -26,14 +26,14 @@ https://webgal-jp-demo.onrender.com/
 
 現在公開されているゲーム（中国語）:
 
-[ベルカラー☆メモリー](http://hoshinasuzu.cn/suzu.html) by Hoshinasuzu  [代替リンク](http://hoshinasuzu.cc/)
+[WebGAL公式ゲーム紹介ページ](https://www.openwebgal.com/games/)
 
 ### WebGALでゲームを作成
 
 [WebGAL 開発ドキュメント](https://docs.openwebgal.com/ja)
 ※日本語の開発ドキュメントは準備中です
 
-[WebGAL Webエディターのダウンロードはこちら](https://github.com/MakinoharaShoko/WebGAL_Terre/releases)
+[WebGAL Webエディターのダウンロードはこちら](https://github.com/OpenWebGAL/WebGAL_Terre/releases)
 
 ## WebGALの魅力と機能
 
@@ -55,6 +55,14 @@ WebGAL はオープンソース ソフトウェアであるため、MPL-2.0 オ�
 
 [このプロジェクトのスポンサー](https://docs.openwebgal.com/ja/sponsor/)
 
+## WebGAL 関連プロジェクト
+
+- [webgal-craft](https://github.com/A-kirami/webgal-craft): コミュニティ開発中の WebGAL 向けビジュアルエディターです。
+- [Webgal_transformEditor](https://github.com/KonshinHaoshin/Webgal_transformEditor): `setTransform` と `changeFigure` を視覚的に編集できるツールです。
+- [webgal-language-tools](https://github.com/xiaoxustudio/webgal-language-tools): Volar.js ベースの WebGAL 言語ツール群で、LSP、VS Code 拡張、Monaco に対応しています。
+- [webgal-tool-l2dw](https://github.com/LostWaym/webgal-tool-l2dw): Live2D モデルやモーションを調整し、WebGAL 向け命令を出力できるツールです。
+- [webgal-mygo](https://github.com/boomwwww/webgal-mygo): MyGO 向けに保守されている WebGAL 専用エンジンのフォークです。
+
 # Sponsors
 
 <a href="https://openwebgal.com/">
@@ -63,4 +71,4 @@ WebGAL はオープンソース ソフトウェアであるため、MPL-2.0 オ�
 
 ## Stargazers over time
 
-[![Stargazers over time](https://starchart.cc/MakinoharaShoko/WebGAL.svg)](https://starchart.cc/MakinoharaShoko/WebGAL)
+[![Stargazers over time](https://starchart.cc/OpenWebGAL/WebGAL.svg)](https://starchart.cc/OpenWebGAL/WebGAL)
